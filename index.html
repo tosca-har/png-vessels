@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>PNG pottery</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> The Jars of Papua
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			
+			let container;
+			let camera, scene, renderer;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
+	
+			let raycaster;
+
+			const intersected = [];
+			const intersected2 = [];
+			const tempMatrix = new THREE.Matrix4();
+			let zeroz = new THREE.Vector3( 0, 0.74 , 0); // table height
+			let controls, jars, torus, selectedPlane, trueposition;
+// can either have 26 galleries that hide and show, or change the texture on one gallery. As changed out of init must be declared here.
+			let gallery, adzeraG, agarabiG, aibomG, aloaloG, bauG, begilamG, collG, demtaG, dimiriG, huonG, ilesalesG;
+			let kaiepG, kombioG, louisadeG, mailuG, malukuG, manusG, marikG, menoG, motoG, pubineriG, triobriandG, tumleoG;
+			let waigeoG, yabobG;
+			let agarabiM, adzeraM, collingwoodM, triobriandM, aibomM, demtaM, mailuM, bauM, pubineriM, marikM, yabobM, waigeoM;
+			let aloaloM, louisadeM, dimiriM, begilamM, kombioM, menoM, tumleoM, ilesalesM, malukuM, kaiepM, manusM, motoM, huonM;
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf7d382 ); // peach
+				
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 0, 1.6, 3 );
+
+				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 1.6, 0 );
+				controls.update();
+
+				const textureLoader = new THREE.TextureLoader()
+				// Load information panels  -first one is instructions
+				const introTexture = textureLoader.load( 'textures/Intro.jpg' );
+				const refTexture = textureLoader.load( 'textures/sources.jpg' );			
+				const keyTexture = textureLoader.load( 'textures/key.jpg' );
+				const adzeraTexture = textureLoader.load( 'textures/Adzera.jpg' );
+				const agarabiTexture = textureLoader.load( 'textures/Agarabi.jpg' );
+				const bauTexture = textureLoader.load( 'textures/Bau.jpg' );
+				const begilamTexture = textureLoader.load( 'textures/Begilam.jpg' );
+				const aibomTexture = textureLoader.load( 'textures/Aibom.jpg' );
+				const kombioTexture = textureLoader.load( 'textures/Kombio.jpg' );
+				const demtaTexture = textureLoader.load( 'textures/Demta.jpg' );
+				const aloaloTexture = textureLoader.load( 'textures/Aloalo.jpg' );
+				const collingwoodTexture = textureLoader.load( 'textures/Collingwood.jpg' );
+				const marikTexture = textureLoader.load( 'textures/Marik.jpg' );
+				const motoTexture = textureLoader.load( 'textures/Moto.jpg' );
+				const mailuTexture = textureLoader.load( 'textures/Mailu.jpg' );
+				const louisadeTexture = textureLoader.load( 'textures/Louisade.jpg' );
+				const waigeoTexture = textureLoader.load( 'textures/Waigeo.jpg' );
+				const dimiriTexture = textureLoader.load( 'textures/Dimiri.jpg' );
+				const kaiepTexture = textureLoader.load( 'textures/Kaiep.jpg' );
+				const tumleoTexture = textureLoader.load( 'textures/Tumleo.jpg' );
+				const huonTexture = textureLoader.load( 'textures/Huon.jpg' );
+				const pubineriTexture = textureLoader.load( 'textures/Pubineri.jpg' );
+				const yabobTexture = textureLoader.load( 'textures/Yabob.jpg' );
+				const ilesalesTexture = textureLoader.load( 'textures/IleSales.jpg' );
+				const malukuTexture = textureLoader.load( 'textures/Maluku.jpg' );
+				const manusTexture = textureLoader.load( 'textures/Manus.jpg' );
+				const menoTexture = textureLoader.load( 'textures/Meno.jpg' );
+				const triobriandTexture  = textureLoader.load( 'textures/Triobriand.jpg' );
+				
+
+
+				const gallery2 = new THREE.Mesh(new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: keyTexture }));
+				gallery2.position.set( 0.75, 1.1, -.75); 
+				scene.add( gallery2);
+				const gallery3 = new THREE.Mesh(new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: refTexture }));
+				gallery3.position.set( -.75, 1.1, -.75); 
+				scene.add( gallery3);
+
+
+				gallery = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: introTexture }));
+				gallery.position.set( 0, 1.1, -.75); 
+				scene.add( gallery);
+				selectedPlane = gallery;
+
+				adzeraG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: adzeraTexture }));
+				adzeraG.position.set( 0, 1.1, -.75); 
+				scene.add( adzeraG);
+				adzeraG.visible = false;
+				agarabiG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: agarabiTexture }));
+				agarabiG.position.set( 0, 1.1, -.75); 
+				scene.add( agarabiG);
+				agarabiG.visible = false;
+
+				bauG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: bauTexture }));
+				bauG.position.set( 0, 1.1, -.75); 
+				scene.add( bauG);
+				bauG.visible = false;
+				begilamG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: begilamTexture }));
+				begilamG.position.set( 0, 1.1, -.75); 
+				scene.add( begilamG);
+				begilamG.visible = false;
+				aibomG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: aibomTexture }));
+				aibomG.position.set( 0, 1.1, -.75); 
+				scene.add( aibomG);
+				aibomG.visible = false;
+				kombioG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: kombioTexture }));
+				kombioG.position.set( 0, 1.1, -.75); 
+				scene.add( kombioG);
+				kombioG.visible = false;
+
+				demtaG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: demtaTexture }));
+				demtaG.position.set( 0, 1.1, -.75); 
+				scene.add( demtaG);
+				demtaG.visible = false;
+				collG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: collingwoodTexture }));
+				collG.position.set( 0, 1.1, -.75); 
+				scene.add( collG);
+				collG.visible = false;
+				aloaloG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: aloaloTexture }));
+				aloaloG.position.set( 0, 1.1, -.75); 
+				scene.add( aloaloG);
+				aloaloG.visible = false;
+				marikG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: marikTexture }));
+				marikG.position.set( 0, 1.1, -.75); 
+				scene.add( marikG);
+				marikG.visible = false;
+
+				louisadeG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: louisadeTexture }));
+				louisadeG.position.set( 0, 1.1, -.75); 
+				scene.add( louisadeG);
+				louisadeG.visible = false;
+				motoG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: motoTexture }));
+				motoG.position.set( 0, 1.1, -.75); 
+				scene.add(motoG);
+				motoG.visible = false;
+				mailuG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: mailuTexture }));
+				mailuG.position.set( 0, 1.1, -.75); 
+				scene.add( mailuG);
+				mailuG.visible = false;
+				waigeoG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: waigeoTexture }));
+				waigeoG.position.set( 0, 1.1, -.75); 
+				scene.add( waigeoG);
+				waigeoG.visible = false;
+				dimiriG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: dimiriTexture }));
+				dimiriG.position.set( 0, 1.1, -.75); 
+				scene.add(dimiriG);
+				dimiriG.visible = false;
+				kaiepG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: kaiepTexture }));
+				kaiepG.position.set( 0, 1.1, -.75); 
+				scene.add(kaiepG);
+				kaiepG.visible = false;
+				tumleoG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: tumleoTexture }));
+				tumleoG.position.set( 0, 1.1, -.75); 
+				scene.add( tumleoG);
+				tumleoG.visible = false;
+				huonG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: huonTexture }));
+				huonG.position.set( 0, 1.1, -.75); 
+				scene.add(  huonG);
+				huonG.visible = false;
+
+				yabobG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: yabobTexture }));
+				yabobG.position.set( 0, 1.1, -.75); 
+				scene.add(yabobG);
+				yabobG.visible = false;
+				malukuG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: malukuTexture }));
+				malukuG.position.set( 0, 1.1, -.75); 
+				scene.add(malukuG);
+				malukuG.visible = false;
+				ilesalesG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: ilesalesTexture }));
+				ilesalesG.position.set( 0, 1.1, -.75); 
+				scene.add( ilesalesG);
+				ilesalesG.visible = false;
+				pubineriG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: pubineriTexture }));
+				pubineriG.position.set( 0, 1.1, -.75); 
+				scene.add(  pubineriG);
+				pubineriG.visible = false;
+
+				manusG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: manusTexture }));
+				manusG.position.set( 0, 1.1, -.75); 
+				scene.add(manusG);
+				manusG.visible = false;
+				menoG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: menoTexture }));
+				menoG.position.set( 0, 1.1, -.75); 
+				scene.add( menoG);
+				menoG.visible = false;
+				triobriandG = new THREE.Mesh( new THREE.PlaneGeometry( 0.5, 0.5 ), new THREE.MeshBasicMaterial({ map: triobriandTexture }));
+				triobriandG.position.set( 0, 1.1, -.75); 
+				scene.add( triobriandG);
+				triobriandG.visible = false;
+			
+
+
+
+				//the Map
+				const mapGeometry = new THREE.PlaneGeometry( 3.0, 1.5 );
+				const mapTexture = textureLoader.load('textures/png.png'); //from google maps
+				mapTexture.generateMipmaps = true //saves gpu if false
+				const theMap = new THREE.Mesh( mapGeometry, new THREE.MeshBasicMaterial({ map: mapTexture }));
+				theMap.rotation.x = - Math.PI / 2;
+				theMap.position.set( 0, 0.73, 0); //desk
+				scene.add( theMap);
+
+
+				//Lights
+				//scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) ); 
+				scene.add( new THREE.HemisphereLight( 0xffffbb, 0x080820, 1) ); //sky, ground, intensity 0xffffbb, 0x080820, 1
+				const light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 6, 0 );
+				scene.add( light );
+
+
+				// jars
+				jars = new THREE.Group();
+				scene.add( jars );
+				const sectionMeshes = []
+				let piecescale = 1;
+				const loader = new GLTFLoader();
+				const dracoLoader = new DRACOLoader();
+ 				dracoLoader.setDecoderPath( '/draco/' );
+ 				loader.setDRACOLoader( dracoLoader );
+
+				const parameters = {
+			    materialColor: '#9c5315',
+				ringTopColor: '#19ffE7',
+				coilColor: '#ff0000',
+				paddleColor: '#1e2f97',
+				coilBeatenColor: '#e8e337',
+				paddleAddColor: '#a61ef4',
+				wangelaColor: '#BEBEBE',
+				amphColor: '#fc9483',
+				nabColor: '#209F00'
+				}
+
+// really should change so scale or colour accepted as argument if pos
+				function onLoadAdzera( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					adzeraM = model.children[0];
+					adzeraM.position.set( x, y, z );
+					//piece.position.set( 0, 0.73, 0); //desk
+					adzeraM.scale.set( piecescale, piecescale, piecescale);
+					adzeraM.material.color.set(parameters.coilBeatenColor);
+					const aloc = new THREE.Vector3(0.61, 0.74, 0.15);
+					adzeraM.userData.loc = aloc;
+					jars.add( adzeraM);
+					sectionMeshes.push(adzeraM);
+				}
+
+				function onLoadAgarabi( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					agarabiM = model.children[0];
+					agarabiM.position.set( x, y, z );
+					agarabiM.scale.set( piecescale, piecescale, piecescale);
+					agarabiM.material.color.set(parameters.coilBeatenColor);
+					agarabiM.userData.loc = new THREE.Vector3(0.55, 0.74, 0.15);
+					jars.add( agarabiM);
+					sectionMeshes.push(agarabiM);
+				}
+
+				function onLoadDemta( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					demtaM = model.children[0];
+					demtaM.position.set( x, y, z );
+					demtaM.scale.set( piecescale, piecescale, piecescale);
+					demtaM.material.color.set(parameters.materialColor);
+					demtaM.userData.loc = new THREE.Vector3(0.13, 0.74, -0.16);
+					jars.add( demtaM);
+					sectionMeshes.push(demtaM);
+				}
+
+				function onLoadAibom( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					aibomM = model.children[0];
+					aibomM.position.set( x, y, z );
+					aibomM.scale.set( piecescale, piecescale, piecescale);
+					aibomM.material.color.set(parameters.materialColor);
+					aibomM.userData.loc = new THREE.Vector3(0.36, 0.74,-0.01);
+					jars.add( aibomM);
+					sectionMeshes.push(aibomM);
+				}
+
+				function onLoadMailu( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1.0;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					mailuM = model.children[0];
+					mailuM.position.set( x, y, z );
+					mailuM.scale.set( piecescale, piecescale, piecescale);
+					mailuM.material.color.set(parameters.nabColor);
+					mailuM.userData.loc = new THREE.Vector3(0.84, 0.74, 0.48);
+					jars.add( mailuM);
+					sectionMeshes.push(mailuM);
+				}
+
+				function onLoadTriobriand( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1.5;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					triobriandM = model.children[0];
+					triobriandM.position.set( x, y, z );
+					triobriandM.scale.set( piecescale, piecescale, piecescale);
+					triobriandM.material.color.set(parameters.amphColor);
+					triobriandM.userData.loc = new THREE.Vector3(1.01, 0.74, 0.33);
+					jars.add( triobriandM);
+					sectionMeshes.push(triobriandM);
+				}
+
+				function onLoadCollingwood( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1.5;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					collingwoodM = model.children[0];
+					collingwoodM.position.set( x, y, z );
+					collingwoodM.scale.set( piecescale, piecescale, piecescale);
+					collingwoodM.material.color.set(parameters.wangelaColor);
+					collingwoodM.userData.loc = new THREE.Vector3(0.85, 0.74, 0.4);
+					jars.add( collingwoodM);
+					sectionMeshes.push(collingwoodM);
+				}
+
+				function onLoadLouisade( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					louisadeM = model.children[0];
+					louisadeM.position.set( x, y, z );
+					louisadeM.scale.set( piecescale, piecescale, piecescale);
+					louisadeM.material.color.set(parameters.ringTopColor);
+					louisadeM.userData.loc = new THREE.Vector3(0.99, 0.74, 0.59);
+					jars.add( louisadeM);
+					sectionMeshes.push(louisadeM);
+				}
+
+				function onLoadAloalo( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					aloaloM = model.children[0];
+					aloaloM.position.set( x, y, z );
+					aloaloM.scale.set( piecescale, piecescale, piecescale);
+					aloaloM.material.color.set(parameters.ringTopColor);
+					aloaloM.userData.loc = new THREE.Vector3(0.9, 0.74, 0.49);
+					jars.add( aloaloM);
+					sectionMeshes.push(aloaloM);
+				}
+
+				function onLoadMarik( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					marikM = model.children[0];
+					marikM.position.set( x, y, z );
+					marikM.scale.set( piecescale, piecescale, piecescale);
+					marikM.material.color.set(parameters.coilColor);
+					marikM.userData.loc = new THREE.Vector3(0.575, 0.74, 0.079);
+					jars.add( marikM);
+					sectionMeshes.push(marikM);
+				}
+
+				function onLoadDimiri( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					dimiriM = model.children[0];
+					dimiriM.position.set( x, y, z );
+					dimiriM.scale.set( piecescale, piecescale, piecescale);
+					dimiriM.material.color.set(parameters.coilColor);
+					dimiriM.userData.loc = new THREE.Vector3(0.43, 0.74, 0);
+					jars.add( dimiriM);
+					sectionMeshes.push(dimiriM);
+				}
+
+				function onLoadBegilam( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					begilamM = model.children[0];
+					begilamM.position.set( x, y, z );
+					begilamM.scale.set( piecescale, piecescale, piecescale);
+					begilamM.material.color.set(parameters.coilColor);
+					begilamM.userData.loc = new THREE.Vector3(0.28, 0.74, -0.01);
+					jars.add( begilamM);
+					sectionMeshes.push(begilamM);
+				}
+
+				function onLoadSumeo( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					pubineriM = model.children[0];
+					pubineriM.position.set( x, y, z );
+					pubineriM.scale.set( piecescale, piecescale, piecescale);
+					pubineriM.material.color.set(parameters.coilColor);
+					pubineriM.userData.loc = new THREE.Vector3(0.53, 0.74, 0.09);
+					jars.add( pubineriM);
+					sectionMeshes.push(pubineriM);
+				}
+
+				function onLoadBau( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					bauM = model.children[0];
+					bauM.position.set( x, y, z );
+					bauM.scale.set( piecescale, piecescale, piecescale);
+					bauM.material.color.set(parameters.coilColor);
+					bauM.userData.loc = new THREE.Vector3(0.535, 0.74, 0.04);
+					jars.add( bauM);
+					sectionMeshes.push(bauM);
+				}
+
+				function onLoadKombio( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					kombioM = model.children[0];
+					kombioM.position.set( x, y, z );
+					kombioM.scale.set( piecescale, piecescale, piecescale);
+					kombioM.material.color.set(parameters.coilColor);
+					kombioM.userData.loc = new THREE.Vector3(0.29, 0.74, -0.05);
+					jars.add( kombioM);
+					sectionMeshes.push(kombioM);
+				}
+
+				function onLoadMeno( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 1;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					menoM = model.children[0];
+					menoM.position.set( x, y, z );
+					menoM.scale.set( piecescale, piecescale, piecescale);
+					menoM.material.color.set(parameters.coilColor);
+					menoM.userData.loc = new THREE.Vector3(0.33, 0.74, -0.08);
+					jars.add( menoM);
+					sectionMeshes.push(menoM);
+				}
+
+				function onLoadYabob( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					yabobM = model.children[0];
+					yabobM.position.set( x, y, z );
+					yabobM.scale.set( piecescale, piecescale, piecescale);
+					yabobM.material.color.set(parameters.paddleColor);
+					yabobM.userData.loc = new THREE.Vector3(0.572, 0.74, 0.0396);
+					jars.add( yabobM);
+					sectionMeshes.push(yabobM);
+				}
+				function onLoadTumleo( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					tumleoM = model.children[0];
+					tumleoM.position.set( x, y, z );
+					tumleoM.scale.set( piecescale, piecescale, piecescale);
+					tumleoM.material.color.set(parameters.paddleColor);
+					tumleoM.userData.loc = new THREE.Vector3(0.27, 0.74, -0.12);
+					jars.add( tumleoM);
+					sectionMeshes.push(tumleoM);
+				}
+				function onLoadKaiep( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					kaiepM = model.children[0];
+					kaiepM.position.set( x, y, z );
+					kaiepM.scale.set( piecescale, piecescale, piecescale);
+					kaiepM.material.color.set(parameters.paddleColor);
+					kaiepM.userData.loc = new THREE.Vector3(0.41, 0.74, -0.07);
+					jars.add( kaiepM);
+					sectionMeshes.push(kaiepM);
+				}
+				function onLoadMoto( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					motoM = model.children[0];
+					motoM.position.set( x, y, z );
+					motoM.scale.set( piecescale, piecescale, piecescale);
+					motoM.material.color.set(parameters.paddleColor);
+					motoM.userData.loc = new THREE.Vector3(0.71, 0.74, 0.42);
+					jars.add( motoM);
+					sectionMeshes.push(motoM);
+				}
+				function onLoadHuon( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					huonM = model.children[0];
+					huonM.position.set( x, y, z );
+					huonM.scale.set( piecescale, piecescale, piecescale);
+					huonM.material.color.set(parameters.paddleColor);
+					huonM.userData.loc = new THREE.Vector3(0.71, 0.74, 0.13);
+					jars.add( huonM);
+					sectionMeshes.push(huonM);
+				}
+				function onLoadManus( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					manusM = model.children[0];
+					manusM.position.set( x, y, z );
+					manusM.scale.set( piecescale, piecescale, piecescale);
+					manusM.material.color.set(parameters.paddleColor);
+					manusM.userData.loc = new THREE.Vector3(0.66, 0.74, -0.2);
+					jars.add( manusM);
+					sectionMeshes.push(manusM);
+				}
+				function onLoadIlesales( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() - 0.2;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					ilesalesM = model.children[0];
+					ilesalesM.position.set( x, y, z );
+					ilesalesM.scale.set( piecescale, piecescale, piecescale);
+					ilesalesM.material.color.set(parameters.paddleColor);
+					ilesalesM.userData.loc = new THREE.Vector3(-0.34, 0.74, 0.11);
+					jars.add( ilesalesM);
+					sectionMeshes.push(ilesalesM);
+				}
+
+				function onLoadMaluku( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() ;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					malukuM = model.children[0];
+					malukuM.position.set( x, y, z );
+					malukuM.scale.set( piecescale, piecescale, piecescale);
+					malukuM.material.color.set(parameters.paddleAddColor);
+					malukuM.userData.loc = new THREE.Vector3(-0.86, 0.74, -0.08);
+					jars.add( malukuM);
+					sectionMeshes.push(malukuM);
+				}
+
+				function onLoadWaigeo( gltf ) {
+					const model = gltf.scene;					
+					const x = Math.random() ;
+					const y = 1.2;
+					const z = Math.random() * 0.5 - 0.3 ;
+					waigeoM = model.children[0];
+					waigeoM.position.set( x, y, z );
+					waigeoM.scale.set( piecescale, piecescale, piecescale);
+					waigeoM.material.color.set(parameters.paddleAddColor);
+					waigeoM.userData.loc = new THREE.Vector3(-0.65, 0.74, -0.35);
+					jars.add( waigeoM);
+					sectionMeshes.push(waigeoM);
+				}
+
+
+
+
+
+				loader.load( 'models/gltf/maluku.glb', onLoadMaluku, undefined, function ( error ) {
+					console.error( error );
+				} );
+		
+				loader.load( 'models/gltf/adzera.glb', onLoadAdzera, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/agarabi.glb', onLoadAgarabi, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/aibom.glb', onLoadAibom, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/bau.glb', onLoadBau, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/aloalo.glb', onLoadAloalo, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/begilam.glb', onLoadBegilam, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/collingwood.glb', onLoadCollingwood, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/demta.glb', onLoadDemta, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/dimiri.glb', onLoadDimiri, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/huon.glb', onLoadHuon, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/ilesales.glb', onLoadIlesales, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/kaiep.glb', onLoadKaiep, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/kombio.glb', onLoadKombio, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/louisade.glb', onLoadLouisade, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/mailu.glb', onLoadMailu, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/manus.glb', onLoadManus, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/marik.glb', onLoadMarik, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/meno.glb', onLoadMeno, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/moto.glb', onLoadMoto, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/pubineri.glb', onLoadSumeo, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/triobriand.glb', onLoadTriobriand, undefined, function ( error ) {
+					console.error( error );
+				} );
+				loader.load( 'models/gltf/tumleo.glb', onLoadTumleo, undefined, function ( error ) {
+					console.error( error );
+				} );
+				 loader.load( 'models/gltf/waiGeo.glb', onLoadWaigeo, undefined, function ( error ) {
+				 	console.error( error );
+				 } );
+				loader.load( 'models/gltf/yabob.glb', onLoadYabob, undefined, function ( error ) {
+					console.error( error );
+				} );
+
+				// torus
+				torus = new THREE.Group();
+				scene.add( torus );
+				const sectionTorus = []
+				const torusMaterial = new THREE.MeshBasicMaterial({color: 0x006400});
+				const torusGeometry = new THREE.TorusGeometry( 0.015, 0.005, 20, 20 );
+
+			
+
+				const agarabiSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				agarabiSite.position.set(0.55, 0.74, 0.15);
+				agarabiSite.scale.set( piecescale, piecescale, piecescale);
+				agarabiSite.rotation.x = -Math.PI * 1/2;
+				agarabiSite.userData.planes = agarabiG;
+				torus.add( agarabiSite);
+
+				const dimiriSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				dimiriSite.position.set(0.43, 0.74, 0);
+				dimiriSite.scale.set( piecescale, piecescale, piecescale);
+				dimiriSite.rotation.x = -Math.PI * 1/2;
+				dimiriSite.userData.planes = dimiriG;
+				torus.add(dimiriSite);
+
+				const begilamSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				begilamSite.position.set(0.28, 0.74, -0.01);
+				begilamSite.scale.set( piecescale, piecescale, piecescale);
+				begilamSite.rotation.x = -Math.PI * 1/2;
+				begilamSite.userData.planes = begilamG;
+				torus.add(begilamSite);
+
+				const ilesalesSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				ilesalesSite.position.set(-0.34, 0.74, 0.11);
+				ilesalesSite.scale.set( piecescale, piecescale, piecescale);
+				ilesalesSite.rotation.x = -Math.PI * 1/2;
+				ilesalesSite.userData.planes = ilesalesG;
+				torus.add( ilesalesSite);
+		
+				const louisadeSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				louisadeSite.position.set(0.99, 0.74, 0.59);
+				louisadeSite.scale.set( piecescale, piecescale, piecescale);
+				louisadeSite.rotation.x = -Math.PI * 1/2;
+				louisadeSite.userData.planes = louisadeG;
+				torus.add(louisadeSite);
+
+				const aloaloSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				aloaloSite.position.set(0.9, 0.74, 0.49);
+				aloaloSite.scale.set( piecescale, piecescale, piecescale);
+				aloaloSite.rotation.x = -Math.PI * 1/2;
+				aloaloSite.userData.planes = aloaloG;
+				torus.add(aloaloSite);
+
+				const mailuSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				mailuSite.position.set(0.84, 0.74, 0.48);
+				mailuSite.scale.set( piecescale, piecescale, piecescale);
+				mailuSite.rotation.x = -Math.PI * 1/2;
+				mailuSite.userData.planes = mailuG;
+				torus.add(mailuSite);
+
+				const motoSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				motoSite.position.set(0.71, 0.74, 0.42);
+				motoSite.scale.set( piecescale, piecescale, piecescale);
+				motoSite.rotation.x = -Math.PI * 1/2;
+				motoSite.userData.planes = motoG;
+				torus.add( motoSite);
+
+				const collSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				collSite.position.set(0.85, 0.74, 0.4);
+				collSite.scale.set( piecescale, piecescale, piecescale);
+				collSite.rotation.x = -Math.PI * 1/2;
+				collSite.userData.planes = collG;
+				torus.add(collSite);
+
+				const triobriandSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				triobriandSite.position.set(1.01, 0.74, 0.33);
+				triobriandSite.scale.set( piecescale, piecescale, piecescale);
+				triobriandSite.rotation.x = -Math.PI * 1/2;
+				triobriandSite.userData.planes = triobriandG;
+				torus.add(triobriandSite);
+
+				const adzeraSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				adzeraSite.position.set(0.61, 0.74, 0.15);
+				adzeraSite.scale.set( piecescale, piecescale, piecescale);
+				adzeraSite.rotation.x = -Math.PI * 1/2;
+				adzeraSite.userData.planes = adzeraG;
+				torus.add(adzeraSite);
+
+				const huonSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				huonSite.position.set(0.71, 0.74, 0.13);
+				huonSite.scale.set( piecescale, piecescale, piecescale);
+				huonSite.rotation.x = -Math.PI * 1/2;
+				huonSite.userData.planes = huonG;
+				torus.add( huonSite);
+
+				const marikSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				marikSite.position.set(0.575, 0.74, 0.079);
+				marikSite.scale.set( piecescale, piecescale, piecescale);
+				marikSite.rotation.x = -Math.PI * 1/2;
+				marikSite.userData.planes = marikG;
+				torus.add(marikSite);
+
+				const sumeoSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				sumeoSite.position.set(0.53, 0.74, 0.09);
+				sumeoSite.scale.set( piecescale, piecescale, piecescale);
+				sumeoSite.rotation.x = -Math.PI * 1/2;
+				sumeoSite.userData.planes = pubineriG;
+				torus.add(sumeoSite);
+
+				const yabobSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				yabobSite.position.set(0.572, 0.74, 0.0396);
+				yabobSite.scale.set( piecescale, piecescale, piecescale);
+				yabobSite.rotation.x = -Math.PI * 1/2;
+				yabobSite.userData.planes = yabobG;
+				torus.add(yabobSite);
+
+				const bauSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				bauSite.position.set(0.535, 0.74, 0.04);
+				bauSite.scale.set( piecescale, piecescale, piecescale);
+				bauSite.rotation.x = -Math.PI * 1/2;
+				bauSite.userData.planes = bauG;
+				torus.add( bauSite);
+
+				const manusSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				manusSite.position.set(0.66, 0.74, -0.2);
+				manusSite.scale.set( piecescale, piecescale, piecescale);
+				manusSite.rotation.x = -Math.PI * 1/2;
+				manusSite.userData.planes = manusG;
+				torus.add(manusSite);
+				
+				const kaiepSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				kaiepSite.position.set(0.41, 0.74, -0.07);
+				kaiepSite.scale.set( piecescale, piecescale, piecescale);
+				kaiepSite.rotation.x = -Math.PI * 1/2;
+				kaiepSite.userData.planes = kaiepG;
+				torus.add(kaiepSite);
+
+				const aibomSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				aibomSite.position.set(0.36, 0.74,-0.01);
+				aibomSite.scale.set( piecescale, piecescale, piecescale);
+				aibomSite.rotation.x = -Math.PI * 1/2;
+				aibomSite.userData.planes = aibomG;
+				torus.add(aibomSite);
+
+				const kombioSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				kombioSite.position.set(0.29, 0.74, -0.05);
+				kombioSite.scale.set( piecescale, piecescale, piecescale);
+				kombioSite.rotation.x = -Math.PI * 1/2;
+				kombioSite.userData.planes = kombioG;
+				torus.add( kombioSite);
+
+				const menoSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				menoSite.position.set(0.33, 0.74, -0.08);
+				menoSite.scale.set( piecescale, piecescale, piecescale);
+				menoSite.rotation.x = -Math.PI * 1/2;
+				menoSite.userData.planes = menoG;
+				torus.add(menoSite);
+
+				const tumleoSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				tumleoSite.position.set(0.27, 0.74, -0.12);
+				tumleoSite.scale.set( piecescale, piecescale, piecescale);
+				tumleoSite.rotation.x = -Math.PI * 1/2;
+				tumleoSite.userData.planes = tumleoG;
+				torus.add(tumleoSite);
+
+				const demtaSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				demtaSite.position.set(0.13, 0.74, -0.16);
+				demtaSite.scale.set( piecescale, piecescale, piecescale);
+				demtaSite.rotation.x = -Math.PI * 1/2;
+				demtaSite.userData.planes = demtaG;
+				torus.add(demtaSite);
+
+				const waigeoSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				waigeoSite.position.set(-0.65, 0.74, -0.35);
+				waigeoSite.scale.set( piecescale, piecescale, piecescale);
+				waigeoSite.rotation.x = -Math.PI * 1/2;
+				waigeoSite.userData.planes = waigeoG;
+				torus.add( waigeoSite);
+
+				const malukuSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.005, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+				malukuSite.position.set(-0.86, 0.74, -0.08);
+				malukuSite.scale.set( piecescale, piecescale, piecescale);
+				malukuSite.rotation.x = -Math.PI * 1/2;
+				malukuSite.userData.planes = malukuG;
+				torus.add(malukuSite);
+
+
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.shadowMap.enabled = true;
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				// controllers
+
+				controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'selectstart', onSelectStart2 );
+				controller1.addEventListener( 'selectend', onSelectEnd2 );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
+				scene.add( controller2 );
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+
+				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				const line = new THREE.Line( geometry );
+				line.name = 'line';
+				line.scale.z = 5;
+
+				controller1.add( line.clone() );
+				controller2.add( line.clone() );
+
+				raycaster = new THREE.Raycaster();
+
+				window.addEventListener( 'resize', onWindowResize );
+			}
+
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onSelectStart2( event ) {
+
+				const controller = event.target;
+
+				const intersections = getIntersections2( controller );
+
+				if ( intersections.length > 0 ) {
+
+					const intersection = intersections[ 0 ];
+					const object = intersection.object;
+					//object.material.emissive.b = 1;
+					object.material.emissive.b = 0;
+					//controller.attach( object );
+
+					controller.userData.selected = object;
+
+				}
+
+			}
+
+			function onSelectEnd2( event ) {
+
+				const controller = event.target;
+
+				if ( controller.userData.selected !== undefined ) {
+
+					const object = controller.userData.selected;
+					object.material.emissive.b = 0;
+					selectedPlane.visible = false;
+					selectedPlane = object.userData.planes;
+					selectedPlane.visible = true;
+					controller.userData.selected = undefined;
+
+				}
+
+
+			}
+			function onSelectStart( event ) {
+
+				const controller = event.target;
+
+				const intersections = getIntersections( controller );
+
+				if ( intersections.length > 0 ) {
+
+					const intersection = intersections[ 0 ];
+
+					const object = intersection.object;
+					//object.material.emissive.b = 1;
+					object.material.emissive.b = 0;
+					controller.attach( object );
+
+					controller.userData.selected = object;
+
+				}
+
+			}
+
+			function onSelectEnd( event ) {
+
+				const controller = event.target;
+
+				if ( controller.userData.selected !== undefined ) {
+
+					const object = controller.userData.selected;
+					object.material.emissive.b = 0;				
+					//test if position is right
+					let aposition = new THREE.Vector3(0,0,0); //needs to be something first
+					object.getWorldPosition( aposition ); //a Vector3 (x,y,z)
+
+					trueposition = object.userData.loc;
+					jars.attach( object );
+					 if ( aposition.distanceTo( trueposition ) < .02) {
+					 	scene.background = new THREE.Color( Math.random() * 0xffffff ); // random
+					 }
+									
+					controller.userData.selected = undefined;
+
+				}
+
+			}
+
+
+			function getIntersections( controller ) {
+
+				tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+				return raycaster.intersectObjects( jars.children, false );
+
+			}
+
+			function getIntersections2( controller ) {
+				tempMatrix.identity().extractRotation( controller.matrixWorld );
+				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+				return raycaster.intersectObjects( torus.children, false );
+
+			}			
+
+			function intersectObjects( controller ) {
+
+				// Do not highlight when already selected
+
+				if ( controller.userData.selected !== undefined ) return;
+
+				const line = controller.getObjectByName( 'line' );
+				const intersections = getIntersections( controller );
+
+				if ( intersections.length > 0 ) {
+
+					const intersection = intersections[ 0 ];
+
+					const object = intersection.object;
+					object.material.emissive.r = 1;
+					intersected.push( object );
+
+					line.scale.z = intersection.distance;
+
+				} else {
+
+					line.scale.z = 5;
+
+				}
+
+			}
+
+			function intersectObjects2( controller ) {
+
+			// Do not highlight when already selected
+
+			if ( controller.userData.selected !== undefined ) return;
+
+				const line = controller.getObjectByName( 'line' );
+				const intersections = getIntersections2( controller );
+
+			if ( intersections.length > 0 ) {
+
+				const intersection = intersections[ 0 ];
+
+				const object = intersection.object;
+				object.material.emissive.r = 1;
+				intersected2.push( object );
+
+				line.scale.z = intersection.distance;
+
+			} else {
+
+				line.scale.z = 5;
+
+			}
+
+		}
+
+			function cleanIntersected() {
+
+				while ( intersected.length ) {
+
+					const object = intersected.pop();
+					object.material.emissive.r = 0;
+
+				}
+			}
+			function cleanIntersected2() {
+
+				while ( intersected2.length ) {
+
+					const object = intersected2.pop();
+					object.material.emissive.r = 0;
+
+				}
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				cleanIntersected();
+				cleanIntersected2();
+				intersectObjects( controller2 );
+				intersectObjects2( controller1 );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
