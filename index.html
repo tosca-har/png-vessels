@@ -49,7 +49,7 @@
 			const intersected = [];
 			const intersected2 = [];
 			const tempMatrix = new THREE.Matrix4(); //for VR controllers
-			let jars, torus, selectedPlane, trueposition, unmoveable;
+			let jars, torus, selectedPlane, selectedTorus, trueposition, unmoveable;
 			//panels
 			let gallery, adzeraG, agarabiG, aibomG, aloaloG, bauG, begilamG, collG, demtaG, dimiriG, huonG, ilesalesG;
 			let kaiepG, kombioG, louisadeG, mailuG, malukuG, manusG, marikG, menoG, motoG, pubineriG, triobriandG, tumleoG;
@@ -307,7 +307,7 @@
 
 				//Lights
 				//scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) ); 
-				scene.add( new THREE.HemisphereLight( 0xffffbb, 0x080820, 1) ); //sky, ground, intensity 0xffffbb, 0x080820, 1
+				scene.add( new THREE.HemisphereLight( 0xffffbb, 0x080820, .5) ); //sky, ground, intensity 0xffffbb, 0x080820, 1
 				const light = new THREE.DirectionalLight( 0xffffff );
 				//const light = new THREE.AmbientLight( 0x404040, 1 );
 				light.position.set( 1, 6, 2 );
@@ -863,6 +863,8 @@
 				lumiSite.userData.planes = lumiG;
 				torus.add(lumiSite); 
 
+				selectedTorus = lumiSite; // initalise so not null (or test if null before emission change)
+
 				const boikinSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
 				boikinSite.position.set(0.37* ratio, desk + 0.01, -0.08* ratio);
 				boikinSite.scale.set( piecescale, piecescale, piecescale);
@@ -1144,8 +1146,12 @@
 				pointer.y = - (event.clientY / window.innerHeight) * 2 + 1
 				raycasterM.setFromCamera( pointer, camera );
 				const intersects = raycasterM.intersectObjects( torus.children);
+				
 				if(intersects.length > 0){
+					selectedTorus.material.emissive.r = 0;
 					const found = intersects[ 0 ].object;
+					selectedTorus = found;
+					found.material.emissive.r = 1;
 					selectedPlane.visible = false;
 					selectedPlane = found.userData.planes;
 					selectedPlane.visible = true;
