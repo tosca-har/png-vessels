@@ -5,6 +5,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+					"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+				}
+			}
+		 </script>
 	</head>
 	<body>
 
@@ -12,28 +20,14 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> The Jars of Papua
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js"
-				}
-			}
-		</script>
-
 		<script type="module">
-
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { DragControls } from './jsm/controls/DragControls.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
-			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
-			//import { GUI } from './jsm/libs/lil-gui.module.min.js';
+        	import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        	import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DragControls } from 'three/addons/controls/DragControls.js';
+        	import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 			
 			let container;
 			let camera, scene, renderer;
@@ -59,6 +53,11 @@
 			let aloaloM, louisadeM, dimiriM, begilamM, kombioM, menoM, tumleoM, ilesalesM, malukuM, kaiepM, manusM, motoM, huonM;
 			let lumiM, boikinM, abelamM, biwariaM, guhuM;
 
+			const loader = new GLTFLoader();
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/' );
+			loader.setDRACOLoader( dracoLoader );
+
 			init(); //sets the scene
 			animate(); //listens for controller interactions
 
@@ -76,7 +75,7 @@
 
 				const textureLoader = new THREE.TextureLoader()
 				// Load information panels  -first one is instructions
-				const introTexture = textureLoader.load( 'textures/Intro.jpg' );
+				const introTexture = textureLoader.load( 'textures/Intro2.jpg' );
 				const refTexture = textureLoader.load( 'textures/sources.jpg' );			
 				const keyTexture = textureLoader.load( 'textures/key.jpg' );
 				const adzeraTexture = textureLoader.load( 'textures/Adzera.jpg' );
@@ -321,14 +320,7 @@
 				scene.add(unmoveable); 
 				const sectionMeshes = []
 				let piecescale = ratio;
-				const loader = new GLTFLoader();
-				const dracoLoader = new DRACOLoader();
- 				dracoLoader.setDecoderPath( '/draco/' );
- 				loader.setDRACOLoader( dracoLoader );
 
-
-
-// really should change so scale or colour accepted as argument if pos
 				
 				function onLoadLumi( gltf ) {
 					const model = gltf.scene;					
