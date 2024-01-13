@@ -180,7 +180,112 @@ However, you will see that it can be difficult to move jars in certain positions
 
 ## Enabling Jar Movement in VR
 
-To simplify things the right controller will move jars and the left will select sites. 
+To simplify things the right controller will move jars and the left will select sites. Alterate listeners will be created and added to the right controller.
+
+After
+```
+		const intersected = [];
+```
+add
+```
+		const intersected2 = [];
+```
+
+in the init function change
+```
+		controller2.addEventListener( 'selectstart', onSelectStart );
+		controller2.addEventListener( 'selectend', onSelectEnd );
+```
+to
+```
+		controller2.addEventListener( 'selectstart', onSelectStart2 );
+		controller2.addEventListener( 'selectend', onSelectEnd2 );
+```
+after
+```
+		function cleanIntersected() {
+			while ( intersected.length ) {
+				const object = intersected.pop();
+				object.material.emissive.r = 0;
+			}
+		}
+```
+add
+```
+			function onSelectStart2( event ) {
+				const controller = event.target;
+				const intersections = getIntersections2( controller );
+				if ( intersections.length > 0 ) {
+					const intersection = intersections[ 0 ];
+					const object = intersection.object;
+					object.material.emissive.b = 0;
+					controller.attach( object );
+					controller.userData.selected = object;
+				}
+			}
+
+			function onSelectEnd2( event ) {
+				const controller = event.target;
+				if ( controller.userData.selected !== undefined ) {
+					const object = controller.userData.selected;
+					object.material.emissive.b = 0;				
+					jars.attach( object );							
+					controller.userData.selected = undefined;
+				}
+			}
+
+			function getIntersections2( controller ) {
+				tempMatrix.identity().extractRotation( controller.matrixWorld );
+				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+				return raycaster.intersectObjects( jars.children, false );
+			}
+
+			function intersectObjects2( controller ) {
+			// Do not highlight when already selected
+			if ( controller.userData.selected !== undefined ) return;
+
+				const line = controller.getObjectByName( 'line' );
+				const intersections = getIntersections2( controller );
+
+			if ( intersections.length > 0 ) {
+				const intersection = intersections[ 0 ];
+				const object = intersection.object;
+				object.material.emissive.r = 1;
+				intersected2.push( object );
+				line.scale.z = intersection.distance;
+
+			} else {
+				line.scale.z = 5;
+			}
+		}
+		function cleanIntersected2() {
+			while ( intersected2.length ) {
+				const object = intersected2.pop();
+				object.material.emissive.r = 0;
+			}
+		}
+```
+Change the render function from;
+```
+    	function render() {
+			cleanIntersected();
+			intersectObjects( controller2 );
+			intersectObjects( controller1 );
+			renderer.render( scene, camera );
+		}
+```
+to
+```
+		function render() {
+				cleanIntersected();
+				cleanIntersected2();
+				intersectObjects( controller2 );
+				intersectObjects2( controller1 );
+				renderer.render( scene, camera );
+			}
+```
+Save and check in VR.
 
 ## Start Jars at Random Positions
 
