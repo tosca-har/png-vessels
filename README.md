@@ -8,7 +8,7 @@ Puzzles can provide a way to engage an audience with 3D models....TODO
 
 ## Contents
 - [Lesson Goals](#lesson-goals)
-- [Software Requirements and Installation](#software-requirements-and-installation)
+- [Software Requirements and Setting Up](#software-requirements-and-setting-up)
 - [Designing the Game](#designing-the-game)
 - [Adding Torus](#adding-torus)
 - [Enabling Jar Movement](#enabling-jar-movement)
@@ -21,22 +21,10 @@ Puzzles can provide a way to engage an audience with 3D models....TODO
 
 ## Lesson Goals
 text
-## Software Requirements and Installation
+## Software Requirements and Setting Up
 
 See part 1. Recommended: a code editor, such as Visual Basic Code and a server such as Node.js.
 This lesson presumes you are starting from the index.html file generated in part 1 and that the textures, models and main.css stylesheet are present. 
-
-## Designing the Game
-
-Plan and sketch the layout. How will the user know what to do? Is it only based on memory or logic? How is a successful match shown? Change the information panel used.
-
-The goal for the user of this game is to start with the jars off the map and the PNG communities marked by selectable tokens. When the communities are selected (mouse click, or VR left controller) the information panel will provide the information on the pots made by that community. Information on how the technique used to make the pot can be used to work out which of the jars may be a match, as the jars are coloured by the technique and a key is provided. The decoration technique may also serve as a guide. The user can move the jars (mouse or VR right controller). If they place the matching jar on the community marker then the jar becomes unmoveable and the background colour changes. 
-
-## Adding Torus
-
-Green torus will be used to mark the communities. They can be harder to aim for than discs, but most PNG communities use torus made of leaves to hold the vessels as they are being made. The torus are a basic three.js geometry, and the diameter, central hole size, and segmentation can be specified. However, torus are generated at the wrong angle for this game and need to be rotated (around the x axis) by 90 degrees (ie -Math.PI *1/2).
-
-Because each torus is connected to a different information plane, they sill be created separately and added to a torus group. The mouse click event listener and left controller listeners have to be altered so that they target the torus group instead of the jar group.
 
 First check that everything is working with the index.html file from part 1, by opening the progect in Visual Studio Code, getting a New Terminal (Terminal > New Terminal), and typing 
 ```
@@ -53,25 +41,146 @@ or put a /* at the beginning and a */ at the end of whole blocks that you want t
  */
 ```
 
-Check that 6 model jars are sitting on the map (you may have to move around to see 1). 
+Check that 6 model jars are sitting on the map (you may have to move around to see them all). 
+
+## Designing the Game
+
+Plan and sketch the layout. How will the user know what to do? Is it only based on memory or logic? How is a successful match shown? Change the information panel used.
+
+The goal for the user of this game is to start with the jars off the map and the PNG communities marked by selectable tokens. When the communities are selected (mouse click, or VR left controller) the information panel will provide the information on the pots made by that community. Information on how the technique used to make the pot can be used to work out which of the jars may be a match, as the jars are coloured by the technique and a key is provided. The decoration technique may also serve as a guide. The user can move the jars (mouse or VR right controller). If they place the matching jar on the community marker then the jar becomes unmoveable and the background colour changes. 
+
+
+## Adding Torus
+
+Green torus will be used to mark the communities. They can be harder to aim for than discs, but most PNG communities use torus made of leaves to hold the vessels as they are being made. The torus are a basic three.js geometry, and the diameter, central hole size, and segmentation can be specified. However, torus are generated at the wrong angle for this game and need to be rotated (around the x axis) by 90 degrees (ie -Math.PI *1/2).
+
+Because each torus is connected to a different information plane, they still need to be created separately and added to a torus group. The mouse click event listener and left controller listeners have to be altered so that they target the torus group instead of the jar group.
 
 In the index.html file REPLACE
+```
 let jars;
+```
 
 with 
 ```
 let jars, torus;
 ```
+in the init function after
+```
+	let piecescale = ratio;
+```
+add
+```
+	torus = new THREE.Group();
+	scene.add( torus );
 
+	const dimiriSite = new THREE.Mesh( new THREE.TorusGeometry(0.015, 0.007, 20, 20  ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	dimiriSite.position.set(0.43 *ratio, desk + 0.01, 0 *ratio);
+	dimiriSite.scale.set( piecescale, piecescale, piecescale);
+	dimiriSite.rotation.x = -Math.PI * 1/2;
+	dimiriSite.userData.planes = dimiriG;
+	torus.add(dimiriSite);
 
+	const louisadeSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	louisadeSite.position.set(0.99* ratio, desk + 0.01, 0.59* ratio);
+	louisadeSite.scale.set( piecescale, piecescale, piecescale);
+	louisadeSite.rotation.x = -Math.PI * 1/2;
+	louisadeSite.userData.planes = louisadeG;
+	torus.add(louisadeSite);
+
+	const mailuSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	mailuSite.position.set(0.84* ratio, desk + 0.01, 0.48* ratio);
+	mailuSite.scale.set( piecescale, piecescale, piecescale);
+	mailuSite.rotation.x = -Math.PI * 1/2;
+	mailuSite.userData.planes = mailuG;
+	torus.add(mailuSite);
+
+	const adzeraSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	adzeraSite.position.set(0.61* ratio, desk + 0.01, 0.15* ratio);
+	adzeraSite.scale.set( piecescale, piecescale, piecescale);
+	adzeraSite.rotation.x = -Math.PI * 1/2;
+	adzeraSite.userData.planes = adzeraG;
+	torus.add(adzeraSite);
+
+	const yabobSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	yabobSite.position.set(0.572* ratio, desk + 0.01, 0.0396* ratio);
+	yabobSite.scale.set( piecescale, piecescale, piecescale);
+	yabobSite.rotation.x = -Math.PI * 1/2;
+	yabobSite.userData.planes = yabobG;
+	torus.add(yabobSite);
+
+	const aibomSite = new THREE.Mesh( new THREE.TorusGeometry( 0.015, 0.007, 20, 20 ), new THREE.MeshStandardMaterial({color: 0x006400}));
+	aibomSite.position.set(0.36* ratio, desk + 0.01,-0.01* ratio);
+	aibomSite.scale.set( piecescale, piecescale, piecescale);
+	aibomSite.rotation.x = -Math.PI * 1/2;
+	aibomSite.userData.planes = aibomG;
+	torus.add(aibomSite);
+
+	selectedTorus = aibomSite; 
+```
+save and check the torus appear on site reload.
+
+in the onClick(event) function change
+```
+const intersects = raycasterM.intersectObjects( jars.children);	
+```
+to
+```
+const intersects = raycasterM.intersectObjects( torus.children);
+```
+save and check the mouse click and panel change now works on torus and not the jars.
+
+in the getIntersections function change
+```
+return raycaster.intersectObjects( jars.children, false );
+```
+to 
+```
+return raycaster.intersectObjects( torus.children, false );
+```
+Save and check this works in VR if possible.
 
 ## Enabling Jar Movement
 
-Adding drag controls.
+To be able to move the jars using the mouse, DragControls have to be imported and created.
+After
+```
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+```
+add
+```
+	import { DragControls } from 'three/addons/controls/DragControls.js';
+```
+change
+```
+	let camera, scene, renderer, controls;
+```
+to
+```
+	let camera, scene, renderer, controls, dragControls;
+```
+in the init function after
+```
+controls.update();
+
+```
+add
+```
+		dragControls = new DragControls( [ jars ], camera, renderer.domElement );
+    	dragControls.addEventListener('dragstart', function (event) {
+        	controls.enabled = false
+    	})
+    	dragControls.addEventListener('dragend', function (event) {
+        	controls.enabled = true
+		})	
+
+```
+save and reload and check that you can now move the jars around.
+However, you will see that it can be difficult to move jars in certain positions in 3D. It is easier to achieve if you view the scene directly from the top or directly from the side. This is one of the benefits of using the game in VR, it is much easier to move the vessels in three dimensions.
 
 ## Enabling Jar Movement in VR
 
-Adding attach to the controllers. Groups.
+To simplify things the right controller will move jars and the left will select sites. 
 
 ## Start Jars at Random Positions
 
@@ -93,9 +202,9 @@ with
 ```
 	const introTexture = textureLoader.load( 'textures/Intro2.jpg' );
 ```
-
+save and check the new instructions appear.
 
 ## Conclusion
 
-TODO.
+TODO. Possible to add a sound effect upon the correct jar match.
 
