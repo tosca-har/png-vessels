@@ -344,7 +344,7 @@
 					const z = Math.random() * 0.5 - 0.3 ;
 					boikinM = model.children[0];
 					boikinM.material = new THREE.MeshStandardMaterial();
-					boikinM.position.set( x, y, z );
+					boikinM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
 					boikinM.scale.set( piecescale, piecescale, piecescale);
 					boikinM.material.color.set(parameters.coilColor);
 					boikinM.userData.loc = new THREE.Vector3(0.37* ratio, desk + 0.01, -0.08* ratio);

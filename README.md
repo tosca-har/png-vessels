@@ -280,8 +280,8 @@ to
 		function render() {
 				cleanIntersected();
 				cleanIntersected2();
-				intersectObjects( controller2 );
-				intersectObjects2( controller1 );
+				intersectObjects( controller1 );
+				intersectObjects2( controller2 );
 				renderer.render( scene, camera );
 			}
 ```
@@ -289,11 +289,240 @@ Save and check in VR.
 
 ## Start Jars at Random Positions
 
-Change location to a random position within certain bounds, but store correct position in userData.
+To make the jars start in a random position above the map, change the position.set to x = Math.random() - 1, y = 1.2, and z = Math.random() * 0.5 - 0.3. Math.random() generates a number between 0 and 1 so all jars will be at the same height but in a random spot within 1 m wide and within a 0.5 m depth. Store the true location in a userData variable. Before you do this you may want to note, or take a screenshot of where at least one of the jars should go.
+
+change
+```
+function onLoadAdzera( gltf ) {
+				const model = gltf.scene;					
+				adzeraM = model.children[0];
+				adzeraM.material = new THREE.MeshStandardMaterial();
+				adzeraM.position.set( 0.61 * ratio, desk + 0.01, 0.15 * ratio);
+				adzeraM.scale.set( piecescale, piecescale, piecescale);
+				adzeraM.material.color.set(parameters.coilBeatenColor);
+				adzeraM.userData.planes = adzeraG;
+				jars.add( adzeraM);
+			}
+			loader.load( 'models/gltf/adzera.glb', onLoadAdzera, undefined, function ( error ) { console.error( error );} );
+							
+			function onLoadAibom( gltf ) {
+				const model = gltf.scene;					
+				aibomM = model.children[0];
+				aibomM.material = new THREE.MeshStandardMaterial();
+				aibomM.position.set( 0.36* ratio, desk + 0.01,-0.01* ratio);
+				aibomM.scale.set( piecescale, piecescale, piecescale);
+				aibomM.material.color.set(parameters.materialColor);
+				aibomM.userData.planes = aibomG;
+				jars.add( aibomM);
+			}
+			loader.load( 'models/gltf/aibom.glb', onLoadAibom, undefined, function ( error ) {console.error( error );} );	
+
+			function onLoadMailu( gltf ) {
+				const model = gltf.scene;					
+				mailuM = model.children[0];
+				mailuM.material = new THREE.MeshStandardMaterial();
+				mailuM.position.set(0.84* ratio, desk + 0.01, 0.48* ratio);
+				mailuM.scale.set( piecescale, piecescale, piecescale);
+				mailuM.material.color.set(parameters.nabColor);
+				mailuM.userData.planes = mailuG;
+				jars.add( mailuM);
+			}
+			loader.load( 'models/gltf/mailu.glb', onLoadMailu, undefined, function ( error ) { console.error( error );} );
+
+			function onLoadLouisade( gltf ) {
+				const model = gltf.scene;					
+				louisadeM = model.children[0];
+				louisadeM.material = new THREE.MeshStandardMaterial();
+				louisadeM.position.set( 0.99* ratio, desk + 0.01, 0.59* ratio );
+				louisadeM.scale.set( piecescale, piecescale, piecescale);
+				louisadeM.material.color.set(parameters.ringTopColor);
+				louisadeM.userData.planes = louisadeG;
+				jars.add( louisadeM);
+			}
+			loader.load( 'models/gltf/louisade.glb', onLoadLouisade, undefined, function ( error ) {console.error( error );} );
+
+			function onLoadDimiri( gltf ) {
+				const model = gltf.scene;					
+				dimiriM = model.children[0];
+				dimiriM.material = new THREE.MeshStandardMaterial();
+				dimiriM.position.set( 0.43* ratio, desk + 0.01, 0* ratio);
+				dimiriM.scale.set( piecescale, piecescale, piecescale);
+				dimiriM.material.color.set(parameters.coilColor);
+				dimiriM.userData.planes = dimiriG;
+				jars.add( dimiriM);
+			}
+			loader.load( 'models/gltf/dimiri.glb', onLoadDimiri, undefined, function ( error ) { console.error( error );} );
+
+			function onLoadYabob( gltf ) {
+				const model = gltf.scene;					
+				yabobM = model.children[0];
+				yabobM.material = new THREE.MeshStandardMaterial();
+				yabobM.position.set( 0.572* ratio, desk + 0.01, 0.0396* ratio);
+				yabobM.scale.set( piecescale, piecescale, piecescale);
+				yabobM.material.color.set(parameters.paddleColor);
+				yabobM.userData.planes = yabobG;
+				jars.add( yabobM);
+				}
+			loader.load( 'models/gltf/yabob.glb', onLoadYabob, undefined, function ( error ) {console.error( error );} );
+```
+to
+
+```
+function onLoadAdzera( gltf ) {
+				const model = gltf.scene;					
+				adzeraM = model.children[0];
+				adzeraM.material = new THREE.MeshStandardMaterial();
+				adzeraM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
+				adzeraM.scale.set( piecescale, piecescale, piecescale);
+				adzeraM.material.color.set(parameters.coilBeatenColor);
+				adzeraM.userData.loc = new THREE.Vector3(0.61 * ratio, desk + 0.01, 0.15 * ratio);
+				jars.add( adzeraM);
+			}
+			loader.load( 'models/gltf/adzera.glb', onLoadAdzera, undefined, function ( error ) { console.error( error );} );
+							
+			function onLoadAibom( gltf ) {
+				const model = gltf.scene;					
+				aibomM = model.children[0];
+				aibomM.material = new THREE.MeshStandardMaterial();
+				aibomM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
+				aibomM.scale.set( piecescale, piecescale, piecescale);
+				aibomM.material.color.set(parameters.materialColor);
+				aibomM.userData.loc = new THREE.Vector3(0.36* ratio, desk + 0.01,-0.01* ratio);
+				jars.add( aibomM);
+			}
+			loader.load( 'models/gltf/aibom.glb', onLoadAibom, undefined, function ( error ) {console.error( error );} );	
+
+			function onLoadMailu( gltf ) {
+				const model = gltf.scene;					
+				mailuM = model.children[0];
+				mailuM.material = new THREE.MeshStandardMaterial();
+				mailuM.position.set(Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
+				mailuM.scale.set( piecescale, piecescale, piecescale);
+				mailuM.material.color.set(parameters.nabColor);
+				mailuM.userData.loc = new THREE.Vector3(0.84* ratio, desk + 0.01, 0.48* ratio);
+				jars.add( mailuM);
+			}
+			loader.load( 'models/gltf/mailu.glb', onLoadMailu, undefined, function ( error ) { console.error( error );} );
+
+			function onLoadLouisade( gltf ) {
+				const model = gltf.scene;					
+				louisadeM = model.children[0];
+				louisadeM.material = new THREE.MeshStandardMaterial();
+				louisadeM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3  );
+				louisadeM.scale.set( piecescale, piecescale, piecescale);
+				louisadeM.material.color.set(parameters.ringTopColor);
+				louisadeM.userData.loc = new THREE.Vector3(0.99* ratio, desk + 0.01, 0.59* ratio);
+				jars.add( louisadeM);
+			}
+			loader.load( 'models/gltf/louisade.glb', onLoadLouisade, undefined, function ( error ) {console.error( error );} );
+
+			function onLoadDimiri( gltf ) {
+				const model = gltf.scene;					
+				dimiriM = model.children[0];
+				dimiriM.material = new THREE.MeshStandardMaterial();
+				dimiriM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
+				dimiriM.scale.set( piecescale, piecescale, piecescale);
+				dimiriM.material.color.set(parameters.coilColor);
+				dimiriM.userData.loc = new THREE.Vector3(0.43* ratio, desk + 0.01, 0* ratio);
+				jars.add( dimiriM);
+			}
+			loader.load( 'models/gltf/dimiri.glb', onLoadDimiri, undefined, function ( error ) { console.error( error );} );
+
+			function onLoadYabob( gltf ) {
+				const model = gltf.scene;					
+				yabobM = model.children[0];
+				yabobM.material = new THREE.MeshStandardMaterial();
+				yabobM.position.set( Math.random() - 1, 1.2, Math.random() * 0.5 - 0.3 );
+				yabobM.scale.set( piecescale, piecescale, piecescale);
+				yabobM.material.color.set(parameters.paddleColor);
+				yabobM.userData.loc = new THREE.Vector3(0.572* ratio, desk + 0.01, 0.0396* ratio);
+				jars.add( yabobM);
+				}
+			loader.load( 'models/gltf/yabob.glb', onLoadYabob, undefined, function ( error ) {console.error( error );} );
+```
+Save and reload, you should see the jars starting above the map and if you reload, they will be in different random positions.
 
 ## Check for Successful Matches
 
-At the end of each jar movement, check the distance between the jar and the correct position. Set allowed distance. Create a signal for the correct match.
+At the end of each jar movement, you want to check if the jar was moved to the correct spot. To do this you need to determine the distance between the jar and either the true location stored in the userData or the matching site (torus). Here we will use the true location, but if movement of the map was ever allowed, it would have to be changed to the site or position relative to the map. You need to set an allowed distance difference that will allow for non-exact placement, but will not be successful if a jar is placed on a torus nearby, here we will use 5 cm.
+
+If the test is successful, there has to be a signal to the user. Here we will change the background colour to a random colour, and make the jar unmoveable (and rotate it to be upright). No signal will be given for an incorrect match.
+
+Change
+```
+let jars, torus;
+```
+
+to
+```
+let jars, torus, trueposition, unmoveable;
+```
+within in the init function, after:
+```
+	scene.add( jars );
+```
+add
+```
+	unmoveable = new THREE.Group();
+	scene.add(unmoveable); 
+```
+For the mouse controls, change
+```
+dragControls.addEventListener('dragend', function (event) {
+        	controls.enabled = true
+		})	
+```
+to
+```
+	dragControls.addEventListener('dragend', function (event) {
+    	controls.enabled = true
+		let object = event.object;
+		let aposition = object.position; 			
+		trueposition = object.userData.loc;
+		if ( aposition.distanceTo( trueposition ) < .025 * ratio) {
+			scene.background = new THREE.Color( Math.random() * 0xffffff ); // random
+			object.position.set(trueposition.x, trueposition.y, trueposition.z);
+			object.rotation.set(0, 0, 0);
+			unmoveable.attach( object );
+		}		
+    })
+```
+You can save and test this. Moving in 3D can be difficult, its best done in multiple steps viewing from the top (birds eye view) and then viewing from the side to lower the jar to the map.
+
+For the VR controller, replace
+```
+	function onSelectEnd2( event ) {
+		const controller = event.target;
+		if ( controller.userData.selected !== undefined ) {
+			const object = controller.userData.selected;
+			object.material.emissive.b = 0;				
+			jars.attach( object );							
+			controller.userData.selected = undefined;
+		}
+	}
+```
+with
+```
+	function onSelectEnd2( event ) {
+		const controller = event.target;
+		if ( controller.userData.selected !== undefined ) {
+			const object = controller.userData.selected;
+			object.material.emissive.b = 0;				
+			//test if position is right
+			let aposition = new THREE.Vector3(0,0,0); //needs to be something first
+			object.getWorldPosition( aposition ); //a Vector3 (x,y,z)
+			trueposition = object.userData.loc;
+			jars.attach( object );
+			if ( aposition.distanceTo( trueposition ) < .025 * ratio) {
+				scene.background = new THREE.Color( Math.random() * 0xffffff ); // random
+				object.position.set(trueposition.x, trueposition.y, trueposition.z);
+				object.rotation.set(0, 0, 0);
+				unmoveable.attach( object );
+			}									
+			controller.userData.selected = undefined;
+		}
+	}
+```
 
 ## Update the Instructions
 
