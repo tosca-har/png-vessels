@@ -153,11 +153,11 @@ add
 ```
 change
 ```
-	let camera, scene, renderer, controls;
+	let container, camera, scene, renderer, controls;
 ```
 to
 ```
-	let camera, scene, renderer, controls, dragControls;
+	let container, camera, scene, renderer, controls, dragControls;
 ```
 in the init function after
 ```
@@ -204,10 +204,7 @@ to
 after
 ```
 		function cleanIntersected() {
-			while ( intersected.length ) {
-				const object = intersected.pop();
-				object.material.emissive.r = 0;
-			}
+			...
 		}
 ```
 add
@@ -269,10 +266,7 @@ add
 Change the render function from;
 ```
     	function render() {
-			cleanIntersected();
-			intersectObjects( controller2 );
-			intersectObjects( controller1 );
-			renderer.render( scene, camera );
+			...
 		}
 ```
 to
@@ -291,84 +285,21 @@ Save and check in VR.
 
 To make the jars start in a random position above the map, change the position.set to x = Math.random() - 1, y = 1.2, and z = Math.random() * 0.5 - 0.3. Math.random() generates a number between 0 and 1 so all jars will be at the same height but in a random spot within 1 m wide and within a 0.5 m depth. Store the true location in a userData variable. Before you do this you may want to note, or take a screenshot of where at least one of the jars should go.
 
-change
+replace
 ```
-function onLoadAdzera( gltf ) {
-				const model = gltf.scene;					
-				adzeraM = model.children[0];
-				adzeraM.material = new THREE.MeshStandardMaterial();
-				adzeraM.position.set( 0.61 * ratio, desk + 0.01, 0.15 * ratio);
-				adzeraM.scale.set( piecescale, piecescale, piecescale);
-				adzeraM.material.color.set(parameters.coilBeatenColor);
-				adzeraM.userData.planes = adzeraG;
-				jars.add( adzeraM);
-			}
-			loader.load( 'models/gltf/adzera.glb', onLoadAdzera, undefined, function ( error ) { console.error( error );} );
-							
-			function onLoadAibom( gltf ) {
-				const model = gltf.scene;					
-				aibomM = model.children[0];
-				aibomM.material = new THREE.MeshStandardMaterial();
-				aibomM.position.set( 0.36* ratio, desk + 0.01,-0.01* ratio);
-				aibomM.scale.set( piecescale, piecescale, piecescale);
-				aibomM.material.color.set(parameters.materialColor);
-				aibomM.userData.planes = aibomG;
-				jars.add( aibomM);
-			}
-			loader.load( 'models/gltf/aibom.glb', onLoadAibom, undefined, function ( error ) {console.error( error );} );	
-
-			function onLoadMailu( gltf ) {
-				const model = gltf.scene;					
-				mailuM = model.children[0];
-				mailuM.material = new THREE.MeshStandardMaterial();
-				mailuM.position.set(0.84* ratio, desk + 0.01, 0.48* ratio);
-				mailuM.scale.set( piecescale, piecescale, piecescale);
-				mailuM.material.color.set(parameters.nabColor);
-				mailuM.userData.planes = mailuG;
-				jars.add( mailuM);
-			}
-			loader.load( 'models/gltf/mailu.glb', onLoadMailu, undefined, function ( error ) { console.error( error );} );
-
-			function onLoadLouisade( gltf ) {
-				const model = gltf.scene;					
-				louisadeM = model.children[0];
-				louisadeM.material = new THREE.MeshStandardMaterial();
-				louisadeM.position.set( 0.99* ratio, desk + 0.01, 0.59* ratio );
-				louisadeM.scale.set( piecescale, piecescale, piecescale);
-				louisadeM.material.color.set(parameters.ringTopColor);
-				louisadeM.userData.planes = louisadeG;
-				jars.add( louisadeM);
-			}
-			loader.load( 'models/gltf/louisade.glb', onLoadLouisade, undefined, function ( error ) {console.error( error );} );
-
-			function onLoadDimiri( gltf ) {
-				const model = gltf.scene;					
-				dimiriM = model.children[0];
-				dimiriM.material = new THREE.MeshStandardMaterial();
-				dimiriM.position.set( 0.43* ratio, desk + 0.01, 0* ratio);
-				dimiriM.scale.set( piecescale, piecescale, piecescale);
-				dimiriM.material.color.set(parameters.coilColor);
-				dimiriM.userData.planes = dimiriG;
-				jars.add( dimiriM);
-			}
-			loader.load( 'models/gltf/dimiri.glb', onLoadDimiri, undefined, function ( error ) { console.error( error );} );
-
-			function onLoadYabob( gltf ) {
-				const model = gltf.scene;					
-				yabobM = model.children[0];
-				yabobM.material = new THREE.MeshStandardMaterial();
-				yabobM.position.set( 0.572* ratio, desk + 0.01, 0.0396* ratio);
-				yabobM.scale.set( piecescale, piecescale, piecescale);
-				yabobM.material.color.set(parameters.paddleColor);
-				yabobM.userData.planes = yabobG;
-				jars.add( yabobM);
-				}
-			loader.load( 'models/gltf/yabob.glb', onLoadYabob, undefined, function ( error ) {console.error( error );} );
-```
-to
+	function onLoadAdzera( gltf ) {
+				...
+	}
+	........................
+	function onLoadYabob( gltf ) {
+				...
+	}
 
 ```
-function onLoadAdzera( gltf ) {
+with
+
+```
+			function onLoadAdzera( gltf ) {
 				const model = gltf.scene;					
 				adzeraM = model.children[0];
 				adzeraM.material = new THREE.MeshStandardMaterial();
@@ -378,7 +309,6 @@ function onLoadAdzera( gltf ) {
 				adzeraM.userData.loc = new THREE.Vector3(0.61 * ratio, desk + 0.01, 0.15 * ratio);
 				jars.add( adzeraM);
 			}
-			loader.load( 'models/gltf/adzera.glb', onLoadAdzera, undefined, function ( error ) { console.error( error );} );
 							
 			function onLoadAibom( gltf ) {
 				const model = gltf.scene;					
@@ -389,8 +319,7 @@ function onLoadAdzera( gltf ) {
 				aibomM.material.color.set(parameters.materialColor);
 				aibomM.userData.loc = new THREE.Vector3(0.36* ratio, desk + 0.01,-0.01* ratio);
 				jars.add( aibomM);
-			}
-			loader.load( 'models/gltf/aibom.glb', onLoadAibom, undefined, function ( error ) {console.error( error );} );	
+			}	
 
 			function onLoadMailu( gltf ) {
 				const model = gltf.scene;					
@@ -402,7 +331,6 @@ function onLoadAdzera( gltf ) {
 				mailuM.userData.loc = new THREE.Vector3(0.84* ratio, desk + 0.01, 0.48* ratio);
 				jars.add( mailuM);
 			}
-			loader.load( 'models/gltf/mailu.glb', onLoadMailu, undefined, function ( error ) { console.error( error );} );
 
 			function onLoadLouisade( gltf ) {
 				const model = gltf.scene;					
@@ -414,7 +342,6 @@ function onLoadAdzera( gltf ) {
 				louisadeM.userData.loc = new THREE.Vector3(0.99* ratio, desk + 0.01, 0.59* ratio);
 				jars.add( louisadeM);
 			}
-			loader.load( 'models/gltf/louisade.glb', onLoadLouisade, undefined, function ( error ) {console.error( error );} );
 
 			function onLoadDimiri( gltf ) {
 				const model = gltf.scene;					
@@ -426,7 +353,6 @@ function onLoadAdzera( gltf ) {
 				dimiriM.userData.loc = new THREE.Vector3(0.43* ratio, desk + 0.01, 0* ratio);
 				jars.add( dimiriM);
 			}
-			loader.load( 'models/gltf/dimiri.glb', onLoadDimiri, undefined, function ( error ) { console.error( error );} );
 
 			function onLoadYabob( gltf ) {
 				const model = gltf.scene;					
@@ -437,8 +363,8 @@ function onLoadAdzera( gltf ) {
 				yabobM.material.color.set(parameters.paddleColor);
 				yabobM.userData.loc = new THREE.Vector3(0.572* ratio, desk + 0.01, 0.0396* ratio);
 				jars.add( yabobM);
-				}
-			loader.load( 'models/gltf/yabob.glb', onLoadYabob, undefined, function ( error ) {console.error( error );} );
+			}
+
 ```
 Save and reload, you should see the jars starting above the map and if you reload, they will be in different random positions.
 
@@ -469,7 +395,7 @@ add
 For the mouse controls, change
 ```
 dragControls.addEventListener('dragend', function (event) {
-        	controls.enabled = true
+        	...
 		})	
 ```
 to
@@ -492,13 +418,7 @@ You can save and test this. Moving in 3D can be difficult, its best done in mult
 For the VR controller, replace
 ```
 	function onSelectEnd2( event ) {
-		const controller = event.target;
-		if ( controller.userData.selected !== undefined ) {
-			const object = controller.userData.selected;
-			object.material.emissive.b = 0;				
-			jars.attach( object );							
-			controller.userData.selected = undefined;
-		}
+		...
 	}
 ```
 with
@@ -540,5 +460,6 @@ save and check the new instructions appear.
 
 ## Conclusion
 
+If you want all the jars in the puzzle you can uncomment their loading and for each one, first add the userData true location and then set the position using the random position code.
 TODO. Possible to add a sound effect upon the correct jar match.
 
